@@ -1,36 +1,27 @@
 import os
 import json
-import subprocess
-from datetime import datetime
-from connect import s3Client
-from backendHelperFunctions import getFilePath
+from connection import connectToS3
+from backendHelperFunctions import getFilePath, createDirectory, createUniqueFileName, saveAndOpenFile
 import argparse
 
 
-def fetchVehicleData(storeId): 
-    print(storeId)
+def fetchVehicleData(environmentName, storeId): 
     convertedStoreId = getFilePath(storeId)
-    response = s3Client.get_object(Bucket=os.environ["AWS_STORE_BUCKET_NAME"], Key=convertedStoreId)
+ 
+    response = connectToS3(environmentName).get_object(Bucket=os.environ["AWS_STORE_BUCKET_NAME"], Key=convertedStoreId)
     result = json.load(response["Body"])
 
-    project_root = os.path.dirname(os.path.abspath(__file__))
-    storeBucketPath = os.path.join(project_root, "storeBucket")  # if changing this, also change it in .gitignore
-    os.makedirs(storeBucketPath, exist_ok=True)
+    storeBucketPath = createDirectory("storeBucket")
+    outputFileName = createUniqueFileName(storeBucketPath, storeId)
 
-    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-
-    outputFileName = os.path.join(storeBucketPath, f"{storeId}_{timestamp}")
-
-    with open(outputFileName, "w") as file:
-        json.dump(result, file, indent=4)  # Use json.dump to write the result in JSON format
-
-    # Automatically open the file (macOS)
-    subprocess.Popen(['open', outputFileName])
+    saveAndOpenFile(outputFileName, result)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fetch store data from S3.")
+    parser.add_argument('env', type=str, help='Environment (dev, stage, prod)')
     parser.add_argument('storeId', type=str, help='The ID of the vehicle to fetch')
+
     args = parser.parse_args()
 
-    fetchVehicleData(args.storeId)
+    fetchVehicleData(args.env, args.storeId)
