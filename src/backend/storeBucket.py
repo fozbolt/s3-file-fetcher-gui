@@ -5,7 +5,7 @@ from backendHelperFunctions import getFilePath, createDirectory, createUniqueFil
 import argparse
 
 
-def fetchVehicleData(environmentName, storeId): 
+def fetchVehicleData(environmentName, storeId):
     convertedStoreId = getFilePath(storeId)
  
     response = connectToS3(environmentName).get_object(Bucket=os.environ["AWS_STORE_BUCKET_NAME"], Key=convertedStoreId)

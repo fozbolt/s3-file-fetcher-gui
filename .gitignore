@@ -1,7 +1,9 @@
 # my config
 dailyBucket
 storeBucket
-.env.*
+.env.prod
+.env.stage
+.env.dev
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
