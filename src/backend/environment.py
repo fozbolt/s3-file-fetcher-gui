@@ -11,8 +11,10 @@ def loadEnvironment(environmentName):
 
     awsAccesKeyId = os.getenv("AWS_ACCESS_KEY_ID")
     awsSecretKey = os.getenv("AWS_SECRET_ACCESS_KEY")
+    awsLocalstackPort = os.getenv("AWS_LOCALSTACK_PORT")
 
     return {
         "awsAccesKeyId": awsAccesKeyId,
-        "awsSecretKey": awsSecretKey
+        "awsSecretKey": awsSecretKey,
+        "awsLocalstackPort": awsLocalstackPort,
     }

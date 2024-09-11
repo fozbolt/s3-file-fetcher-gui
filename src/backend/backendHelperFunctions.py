@@ -26,7 +26,8 @@ def generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date):
     md5_hash = hashlib.md5()
     md5_hash.update(vehicleUrlWithBody.encode())
     vehicleUrlHashed = md5_hash.hexdigest()
-    convertedDate = date # todo
+
+    convertedDate = date # TODO: add different input format if needed
 
     return {
         "vehicleUrlHashed": vehicleUrlHashed,

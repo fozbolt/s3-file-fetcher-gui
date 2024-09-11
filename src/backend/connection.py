@@ -7,5 +7,6 @@ def connectToS3(environmentName):
     return boto3.client(
         's3',
         aws_access_key_id=environmentVars["awsAccesKeyId"],
-        aws_secret_access_key=environmentVars["awsSecretKey"]
+        aws_secret_access_key=environmentVars["awsSecretKey"],
+        endpoint_url = f"http://localhost:{environmentVars['awsLocalstackPort']}" if environmentVars.get("awsLocalstackPort") else None
     )
