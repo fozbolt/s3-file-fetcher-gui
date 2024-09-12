@@ -1,6 +1,7 @@
 import tkinter
 import tkinter.messagebox
 import customtkinter
+import storeBucket
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue")
@@ -35,8 +36,8 @@ class App(customtkinter.CTk):
 
         # Add buttons in the scrollable frame
         self.sidebar_frame_switches = []
-        for i in range(20):  # Reduced to avoid too much content
-            button = customtkinter.CTkButton(master=self.scrollable_frame, text=f"CTkButton {i}")
+        for i in range(1,20):  # Reduced to avoid too much content
+            button = customtkinter.CTkButton(master=self.scrollable_frame, text=f"record {i}")
             button.grid(row=i, column=0, padx=10, pady=(0, 10), sticky="w")
             self.sidebar_frame_switches.append(button)
 
@@ -55,11 +56,15 @@ class App(customtkinter.CTk):
         self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(5, 20), sticky="w")
 
         # create main entry and button
-        self.entry = customtkinter.CTkEntry(self, placeholder_text="CTkEntry")
-        self.entry.grid(row=3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky="nsew")
+        self.entry_input = customtkinter.CTkEntry(self, placeholder_text="url or storeId")
+        self.entry_input.grid(row=3, column=1, columnspan=2, padx=(20, 0), pady=(20, 20), sticky="nsew")
+        self.entry_input.bind("<KeyRelease>", self.update_disabled_entry)  # Bind key release event
 
-        self.main_button_1 = customtkinter.CTkButton(master=self, fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"))
+
+        # TODO replace with download/open ?
+        self.main_button_1 = customtkinter.CTkButton(master=self, text="Submit" , fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), command=self.submit)
         self.main_button_1.grid(row=3, column=3, padx=(20, 20), pady=(20, 20), sticky="nsew")
+
 
         # create tabview
         self.tabview = customtkinter.CTkTabview(self, width=250, anchor="w")
@@ -69,17 +74,17 @@ class App(customtkinter.CTk):
         self.tabview.tab("Store bucket").grid_columnconfigure(0, weight=1)
         self.tabview.tab("Daily bucket").grid_columnconfigure(0, weight=1)
 
-       # Create a frame in the first tab for radio buttons
+       # Create a frame in the first tab for radio buttons for daily bucket
         self.radio_frame = customtkinter.CTkFrame(self.tabview.tab("Daily bucket"))
         self.radio_frame.grid(row=0, column=0, padx=5, pady=(10, 5), sticky="ew")
 
         # Create radio buttons and place them in the radio_frame
         self.radio_var = customtkinter.StringVar(value="prod")
-        self.radio1 = customtkinter.CTkRadioButton(self.radio_frame, text="Prod", variable=self.radio_var, value="prod", height=20, width=50, radiobutton_height=15)
+        self.radio1 = customtkinter.CTkRadioButton(self.radio_frame, text="Prod", variable=self.radio_var, value="prod", height=20, width=60, radiobutton_width=10, radiobutton_height=10)
         self.radio1.grid(row=0, column=0, padx=2, pady=5, sticky="w")
-        self.radio2 = customtkinter.CTkRadioButton(self.radio_frame, text="Store", variable=self.radio_var, value="store", height=20)
+        self.radio2 = customtkinter.CTkRadioButton(self.radio_frame, text="Stage", variable=self.radio_var, value="stage", height=20, width=60, radiobutton_width=10, radiobutton_height=10)
         self.radio2.grid(row=0, column=1, padx=2, pady=5, sticky="w")
-        self.radio3 = customtkinter.CTkRadioButton(self.radio_frame, text="Dev", variable=self.radio_var, value="dev", height=20)
+        self.radio3 = customtkinter.CTkRadioButton(self.radio_frame, text="Dev", variable=self.radio_var, value="dev", height=20, width=60, radiobutton_width=10, radiobutton_height=10)
         self.radio3.grid(row=0, column=2, padx=2, pady=5, sticky="w")
 
         self.optionmenu_1 = customtkinter.CTkOptionMenu(self.tabview.tab("Daily bucket"), dynamic_resizing=False,
@@ -98,16 +103,44 @@ class App(customtkinter.CTk):
         self.textbox = customtkinter.CTkTextbox(self.tabview.tab("Daily bucket"), width=250)
         self.textbox.grid(row=4, column=0, padx=20, pady=(10, 10), sticky="nsew")
 
+        # Create a frame in the first tab for radio buttons for store bucket
+        self.radio_frame = customtkinter.CTkFrame(self.tabview.tab("Store bucket"))
+        self.radio_frame.grid(row=0, column=0, padx=5, pady=(10, 5), sticky="ew")
+
+        # Create radio buttons and place them in the radio_frame
+        self.radio_var = customtkinter.StringVar(value="prod")
+        self.radio1 = customtkinter.CTkRadioButton(self.radio_frame, text="Prod", variable=self.radio_var, value="prod", height=20, width=60, radiobutton_width=10, radiobutton_height=10)
+        self.radio1.grid(row=0, column=0, padx=2, pady=5, sticky="w")
+        self.radio2 = customtkinter.CTkRadioButton(self.radio_frame, text="Stage", variable=self.radio_var, value="stage", height=20, width=60, radiobutton_width=10, radiobutton_height=10)
+        self.radio2.grid(row=0, column=1, padx=2, pady=5, sticky="w")
+        self.radio3 = customtkinter.CTkRadioButton(self.radio_frame, text="Dev", variable=self.radio_var, value="dev", height=20, width=60, radiobutton_width=10, radiobutton_height=10)
+        self.radio3.grid(row=0, column=2, padx=2, pady=5, sticky="w")
+
         # Add a label to the second tab
-        self.label_tab_2 = customtkinter.CTkLabel(self.tabview.tab("Store bucket"), text="CTkLabel on Tab 2")
-        self.label_tab_2.grid(row=0, column=0, padx=20, pady=20)
+        self.label_tab_2 = customtkinter.CTkLabel(self.tabview.tab("Store bucket"), text="1. input url:", anchor="w")
+        self.label_tab_2.grid(row=1, column=0, padx=2, pady=2)
+
+        # Create a text entry field
+        self.entry_display1 = customtkinter.CTkEntry(self.tabview.tab("Store bucket"), placeholder_text="submit storeId to view", state="disabled")
+        self.entry_display1.grid(row=2, column=0, padx=2, pady=2)
+
+        # Add a label to the second tab
+        self.label_tab_2 = customtkinter.CTkLabel(self.tabview.tab("Store bucket"), text="2. s3 bucket key (file location)", anchor="w")
+        self.label_tab_2.grid(row=3, column=0, padx=2, pady=2)
+
+        # Create a text entry field
+        self.entry = customtkinter.CTkEntry(self.tabview.tab("Store bucket"), placeholder_text="submit storeId to view", state="disabled")
+        self.entry.grid(row=4, column=0, padx=2, pady=2)
+
+        # Move the CTkTextbox into the first tab of the tabview
+        self.textbox = customtkinter.CTkTextbox(self.tabview.tab("Store bucket"), width=250, height=150)
+        self.textbox.grid(row=5, column=0, padx=20, pady=(50, 10), sticky="nsew")
 
         # set default values
         self.appearance_mode_optionemenu.set("Dark")
         self.scaling_optionemenu.set("100%")
         self.optionmenu_1.set("CTkOptionmenu")
         self.combobox_1.set("CTkComboBox")
-        self.textbox.insert("0.0", "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\n" * 10)
 
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
@@ -123,6 +156,20 @@ class App(customtkinter.CTk):
     def sidebar_button_event(self):
         print("sidebar_button click")
 
+    def update_disabled_entry(self, event=None):
+        # Get text from the input entry
+        input_text = self.entry_input.get()
+
+        # Temporarily enable the display entry to update its text, then disable it again
+        self.entry_display1.configure(state="normal")
+        self.entry_display1.delete(0, customtkinter.END)  # Clear existing text
+        self.entry_display1.insert(0, input_text)  # Insert the new text
+        self.entry_display1.configure(state="disabled")
+
+    def submit(self, event=None):
+        key = self.entry_input.get()
+        environment_name = self.radio_var.get() # ovo za sad uvijek daje prod
+        storeBucket.fetchVehicleData(environment_name, key)
 
 if __name__ == "__main__":
     app = App()
