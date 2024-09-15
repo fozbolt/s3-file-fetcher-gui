@@ -5,8 +5,19 @@ import subprocess
 import json
 
 # ee315ac12567a2b44ae03fc30b093334 -> e/e/3/ee315ac12567a2b44ae03fc30b093334
+# returns string alert if string doesn't look like storeId (dummy way of checking with length)
+# in try because of gui crashing when writing incorrect storeId: tring index out of range 
 def getFilePath(storeId):
-    return f"{storeId[0]}/{storeId[1]}/{storeId[2]}/{storeId}"
+    try:
+        if (len(storeId) == 32):
+            return f"{storeId[0]}/{storeId[1]}/{storeId[2]}/{storeId}"
+        elif len(storeId) == 0: 
+            return ''
+        else:
+            return 'invalid storeId'
+    except Exception as e:
+        return ''
+
 
 def createDirectory(dirName):
     project_root = os.path.dirname(os.path.abspath(__file__))
@@ -40,3 +51,57 @@ def saveAndOpenFile(fileName, fileContent):
 
     # Automatically open the file (macOS)
     subprocess.Popen(['open', fileName])
+
+
+def getSortedBucketFileNames(bucketName):
+    bucketPath = os.path.join(os.path.dirname(__file__), bucketName)
+
+    try:
+        return sorted(
+            [name for name in os.listdir(bucketPath) if os.path.isfile(os.path.join(bucketPath, name))],
+            key=getDateFromFileName,
+            reverse=True,
+        )
+
+    except FileNotFoundError:
+        print(f"Directory {bucketPath} not found")
+        return []
+    
+
+def getDateFromFileName(name):
+    return int(name.split('_')[-1])
+
+
+def addRawResponseMapping(vehicleUrl, hash, date, jsonFileName):
+    new_entry = {
+        "hash": hash,
+        "vehicleUrl": vehicleUrl,
+        "date": date
+    }
+    
+    if os.path.exists(jsonFileName):
+        with open(jsonFileName, "r") as file:
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError:
+                data = []
+    else:
+        data = []
+    
+    data.append(new_entry)
+    
+    with open(jsonFileName, "w") as file:
+        json.dump(data, file, indent=4)
+
+
+def getMappingByHash(hash, jsonFileName):
+    if os.path.exists(jsonFileName):
+        with open(jsonFileName, "r") as file:
+            data = json.load(file)
+        
+        for entry in data:
+            if entry['hash'] == hash:
+                return entry['vehicleUrl'], entry['date']
+    
+    return None, None
+
