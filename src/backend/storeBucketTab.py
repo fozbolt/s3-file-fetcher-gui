@@ -125,7 +125,7 @@ class StoreBucketTab:
 
 
     def submit(self):
-        inputText = self.storeIdPlaceholder.get()
+        storeId = self.storeIdPlaceholder.get()
         environmentName = self.storeRadioVar.get()
-        result = storeBucket.fetchVehicleData(environmentName, inputText)
+        result = storeBucket.fetchVehicleData(environmentName, storeId)
         self.updateTextboxStore(result['message'], result['status'])
