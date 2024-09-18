@@ -100,7 +100,7 @@ class DailyBucketTab:
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()
         self.updateEntry(self.dailyEntryDisplay, inputText)
-        self.updateEntry(self.dailyBucketIDEntry, backendHelperFunctions.getFilePath(inputText))
+        self.updateEntry(self.dailyBucketIDEntry, backendHelperFunctions.generateDailyBucketParams(inputText))
 
         if not inputText:
             self.updateTextboxDaily('', '')
@@ -153,7 +153,13 @@ class DailyBucketTab:
 
         message_label = customtkinter.CTkLabel(popup, text=dailyBucketEntryText, wraplength=350)
         message_label.pack(padx=20, pady=20)
-       
+
+    def deleteDailyBucketHistory(self, folderName, scrollableFrame):
+        result = backendHelperFunctions.deleteBucketHistory(self, folderName)
+        self.updateTextboxDaily(result['message'], result['status'])
+
+        if (result["status"] == "success"):
+            self.createSidebarButtons(scrollableFrame, folderName)
 
     def submit(self):
         urlWithBody = self.dailyEntryDisplay.get()
@@ -162,5 +168,5 @@ class DailyBucketTab:
         date = self.dateInput.get()
 
         result = dailyBucket.fetchVehicleRawResponse(environmentName, date, url, vehicleUrlBody) #test what happens if no date is entered, possibly create restriction
-        self.updateTextboxDaily(result['message'], result['status'])
+        self.updateTextboxDaily(result["message"], result["status"])
 

@@ -105,3 +105,34 @@ def getMappingByHash(hash, jsonFileName):
     
     return None, None
 
+
+def deleteBucketHistory(self, folderName):
+    bucketFileNames = getSortedBucketFileNames(folderName)
+    deletedFiles = []
+    errorFiles = []
+
+    if (len(bucketFileNames) == 0):
+        return {
+            "message": "Found 0 files for deletion",
+            "status": "error"
+        }
+    
+    for fileName in bucketFileNames:
+        filePath = f"{os.getcwd()}/src/backend/{folderName}/{fileName}"
+        try:
+            os.remove(filePath)
+            deletedFiles.append(fileName)
+        except OSError as e:
+            errorFiles.append(f"{fileName}: {e}")
+    
+    if errorFiles:
+        return {
+            "message": f"Errors occurred with deletion of: {', '.join(errorFiles)}",
+            "status": "error"
+        }
+    else:
+        return {
+            "message": f"Successfully deleted all files in {folderName}",
+            "status": "success"
+        }
+

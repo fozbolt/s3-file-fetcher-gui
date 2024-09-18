@@ -43,6 +43,8 @@ class App(customtkinter.CTk):
 
         self.logoLabel = customtkinter.CTkLabel(self.sidebarFrame, text="History", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logoLabel.grid(row=0, column=0, padx=20, pady=(20, 0), sticky="w")
+        self.deleteButton = customtkinter.CTkButton(self.sidebarFrame, text="Delete", fg_color="dark red", corner_radius=20, width=70, command=self.deleteHistory)
+        self.deleteButton.grid(row=0, column=0, sticky="e", padx=(0,25), pady=(25,0))
 
         self.scrollableFrame = customtkinter.CTkScrollableFrame(self.sidebarFrame, label_text="Downloads", width=400, label_anchor="w")
         self.scrollableFrame.grid(row=1, column=0, padx=20, pady=(10, 0), sticky="nsew")
@@ -64,6 +66,7 @@ class App(customtkinter.CTk):
         self.scalingOptionMenu.grid(row=8, column=0, padx=20, pady=(5, 20), sticky="w")
 
 
+    # temporary solution because CTk library doesn't have event listener on tab click
     def checkTabName(self):
         newTabName = self.tabview.get()
 
@@ -71,7 +74,7 @@ class App(customtkinter.CTk):
             self.currTabName = newTabName
             self.updateSidebarButtons()
         
-        self.after(5000, self.checkTabName)
+        self.after(2500, self.checkTabName)
 
 
     ## change buttons on tab change
@@ -79,9 +82,12 @@ class App(customtkinter.CTk):
         for button in self.dailyTab.sidebarFrameSwitches:
             button.destroy()
 
-        currTabName = getattr(self, 'currTabName', None)
+        for button in self.storeTab.sidebarFrameSwitches:
+            button.destroy()
+
+        currTabName = getattr(self, 'currTabName', 'Daily bucket')
         currTabViewSlug = 'dailyBucket' if currTabName == 'Daily bucket' else 'storeBucket'
-        
+
         if currTabName == 'Daily bucket':
             self.dailyTab.createSidebarButtons(self.scrollableFrame, currTabViewSlug)
         elif currTabName == 'Store bucket':
@@ -104,6 +110,16 @@ class App(customtkinter.CTk):
     def changeScalingEvent(self, newScaling: str):
         newScalingFloat = float(newScaling.strip('%')) / 100
         customtkinter.set_widget_scaling(newScalingFloat)
+
+    def deleteHistory(self):
+        newTabName = self.tabview.get()
+
+        if newTabName == 'Daily bucket':
+            self.dailyTab.deleteDailyBucketHistory('dailyBucket', self.scrollableFrame)
+        else:
+            self.storeTab.deleteStoreBucketHistory('storeBucket', self.scrollableFrame)
+
+        self.updateSidebarButtons()
 
 if __name__ == "__main__":
     app = App()

@@ -124,6 +124,13 @@ class StoreBucketTab:
         self.updateEntry(self.convertedStoreIdPlaceholder, backendHelperFunctions.getFilePath(fileName))
 
 
+    def deleteStoreBucketHistory(self, folderName, scrollableFrame):
+        result = backendHelperFunctions.deleteBucketHistory(self, folderName)
+        self.updateTextboxStore(result['message'], result['status'])
+
+        if (result["status"] == "success"):
+            self.createSidebarButtons(scrollableFrame, folderName)
+
     def submit(self):
         storeId = self.storeIdPlaceholder.get()
         environmentName = self.storeRadioVar.get()
