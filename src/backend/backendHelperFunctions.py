@@ -3,6 +3,7 @@ from datetime import datetime
 import hashlib
 import subprocess
 import json
+from environment import loadEnvironmentName
 
 # ee315ac12567a2b44ae03fc30b093334 -> e/e/3/ee315ac12567a2b44ae03fc30b093334
 # returns string alert if string doesn't look like storeId (dummy way of checking with length)
@@ -135,4 +136,10 @@ def deleteBucketHistory(self, folderName):
             "message": f"Successfully deleted all files in {folderName}",
             "status": "success"
         }
+    
+    
+def createReverseCheckStoreCmd(environmentName, filePath):
+    #radi, ali promjena environmenta ne updejta stanje
+    bucketName = loadEnvironmentName(environmentName, 'dailyBucket')
 
+    return f"aws s3 cp s3://{bucketName}/{filePath}"

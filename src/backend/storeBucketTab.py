@@ -25,7 +25,7 @@ class StoreBucketTab:
             self.sidebarFrameSwitches.append(button)
 
     def createWidgets(self):
-        self.tab.grid_rowconfigure(5, weight=1)
+        self.tab.grid_rowconfigure(7, weight=1)
         self.tab.grid_columnconfigure(0, weight=1)
 
         self.storeRadioVar = customtkinter.StringVar(value="prod")
@@ -37,19 +37,22 @@ class StoreBucketTab:
         self.convertedStoreIdPlaceholder = customtkinter.CTkEntry(self.tab, placeholder_text="Submit storeId to view", state="disabled", width=300)
         self.convertedStoreIdPlaceholder.grid(row=4, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
+        self.reverseCheckCmdEntry = customtkinter.CTkEntry(self.tab, placeholder_text="Reverse check command", state="disabled", width=600)
+        self.reverseCheckCmdEntry.grid(row=6, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
+
         self.createStoreLabelsAndEntries()
 
         self.storeTextbox = customtkinter.CTkTextbox(self.tab, width=250, height=150)
         self.storeTextbox.configure(state="disabled")
-        self.storeTextbox.grid(row=5, column=0, padx=20, pady=(50, 10), sticky="nsew")
+        self.storeTextbox.grid(row=7, column=0, padx=20, pady=(50, 10), sticky="nsew")
 
     def createMainWidgets(self):
-        self.entryInput = customtkinter.CTkEntry(self.tab, placeholder_text="enter storeId")
-        self.entryInput.grid(row=6, column=0, columnspan=2, padx=(20, 0), pady=(20, 5), sticky="nsew")
+        self.entryInput = customtkinter.CTkEntry(self.tab, placeholder_text="storeId")
+        self.entryInput.grid(row=8, column=0, columnspan=2, padx=(20, 0), pady=(20, 5), sticky="nsew")
         self.entryInput.bind("<KeyRelease>", self.updateEntries)
 
         self.mainButton = customtkinter.CTkButton(self.tab, text="Submit", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), command=self.submit)
-        self.mainButton.grid(row=6, column=2, padx=(20, 20), pady=(20, 5), sticky="nsew")
+        self.mainButton.grid(row=8, column=2, padx=(20, 20), pady=(20, 5), sticky="nsew")
 
     def createStoreRadioFrame(self, tab, variable, options):
         self.storeRadioFrame = customtkinter.CTkFrame(tab)
@@ -59,12 +62,9 @@ class StoreBucketTab:
             radio.grid(row=0, column=i, padx=2, pady=5, sticky="w")
 
     def createStoreLabelsAndEntries(self):
-        self.tab.grid_rowconfigure(0, weight=0)
-        self.tab.grid_rowconfigure(1, weight=0)
-        self.tab.grid_rowconfigure(2, weight=0)
-        self.tab.grid_rowconfigure(3, weight=0)
-        self.tab.grid_rowconfigure(4, weight=0)
-        self.tab.grid_rowconfigure(5, weight=1)
+        self.tab.grid_rowconfigure((0,7), weight=0)
+        self.tab.grid_rowconfigure(7, weight=1)
+
 
         storeLabel1 = customtkinter.CTkLabel(self.tab, text="1. storeId:", anchor="w")
         storeLabel1.grid(row=1, column=0, padx=(25, 5), pady=(20, 2), sticky="w")
@@ -72,10 +72,14 @@ class StoreBucketTab:
         storeLabel2 = customtkinter.CTkLabel(self.tab, text="2. S3 bucket key (file location)", anchor="w")
         storeLabel2.grid(row=3, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
 
+        reverseCheckCmdLabel = customtkinter.CTkLabel(self.tab, text="ADDITIONAL: reverse check terminal command", anchor="w")
+        reverseCheckCmdLabel.grid(row=5, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
+
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()
         self.updateEntry(self.storeIdPlaceholder, inputText)
         self.updateEntry(self.convertedStoreIdPlaceholder, backendHelperFunctions.getFilePath(inputText))
+        self.updateEntry(self.reverseCheckCmdEntry, backendHelperFunctions.createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 
         if not inputText:
             self.updateTextboxStore('', '')
@@ -84,7 +88,7 @@ class StoreBucketTab:
         entry.configure(state="normal")
         entry.delete(0, 'end')
         entry.insert(0, text)
-        entry.configure(state="disabled")
+        entry.configure(state="readonly")
 
     def updateTextboxStore(self, message, status):
         self.storeTextbox.configure(state="normal")
@@ -96,7 +100,7 @@ class StoreBucketTab:
             self.storeTextbox.configure(text_color="red")
 
         self.storeTextbox.insert(customtkinter.END, message)
-        self.storeTextbox.configure(state="disabled")
+        self.storeTextbox.configure(state="readonly")
 
 
     def openFile(self, fileName, folder):

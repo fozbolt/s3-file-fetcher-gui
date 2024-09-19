@@ -90,12 +90,12 @@ class DailyBucketTab:
         self.dailyEntryDisplay.configure(state="normal")
         self.dailyEntryDisplay.delete(0, 'end')
         self.dailyEntryDisplay.insert(0, "Default daily bucket value")
-        self.dailyEntryDisplay.configure(state="disabled")
+        self.dailyEntryDisplay.configure(state="readonly")
 
         self.dailyBucketIDEntry.configure(state="normal")
         self.dailyBucketIDEntry.delete(0, 'end')
         self.dailyBucketIDEntry.insert(0, "Default converted bucket ID")
-        self.dailyBucketIDEntry.configure(state="disabled")
+        self.dailyBucketIDEntry.configure(state="readonly")
 
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()
@@ -109,7 +109,7 @@ class DailyBucketTab:
         entry.configure(state="normal")
         entry.delete(0, 'end')
         entry.insert(0, text)
-        entry.configure(state="disabled")
+        entry.configure(state="readonly")
 
     def updateTextboxDaily(self, message, status):
         self.dailyTextbox.configure(state="normal")

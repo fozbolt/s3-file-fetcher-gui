@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-def loadEnvironment(environmentName):
+def loadEnvironmentKeys(environmentName):
     envFile = os.path.abspath(os.path.join(os.path.realpath(__file__), "../../../", f".env.{environmentName}"))
     
     if not os.path.exists(envFile):
@@ -18,3 +18,17 @@ def loadEnvironment(environmentName):
         "awsSecretKey": awsSecretKey,
         "awsLocalstackPort": awsLocalstackPort,
     }
+
+
+def loadEnvironmentName(environmentName, bucketAlias):
+    envFile = os.path.abspath(os.path.join(os.path.realpath(__file__), "../../../", f".env.{environmentName}"))
+    
+    if not os.path.exists(envFile):
+        raise FileNotFoundError(f"Environment file {envFile} does not exist.")
+    
+    load_dotenv(envFile)
+
+    dailyBucketName = os.getenv("AWS_DAILY_CACHE_BUCKET_NAME")
+    storeBucketName = os.getenv("AWS_STORE_BUCKET_NAME")
+
+    return dailyBucketName if bucketAlias == 'dailyBucket' else storeBucketName

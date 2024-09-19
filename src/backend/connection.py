@@ -1,8 +1,8 @@
 import boto3
-from environment import loadEnvironment
+from environment import loadEnvironmentKeys
 
 def connectToS3(environmentName):
-    environmentVars = loadEnvironment(environmentName)
+    environmentVars = loadEnvironmentKeys(environmentName)
 
     return boto3.client(
         's3',
