@@ -29,7 +29,7 @@ class DailyBucketTab:
         self.tab.grid_columnconfigure(0, weight=1)
 
         self.dailyRadioVar = customtkinter.StringVar(value="prod")
-        self.createDailyRadioFrame(self.tab, ["prod", "stage", "dev"])
+        self.createDailyRadioFrame(self.tab, ["Prod", "Stage", "Dev"])
 
         self.dailyEntryDisplay = customtkinter.CTkEntry(self.tab, placeholder_text="Submit daily bucket data", state="disabled", width=300)
         self.dailyEntryDisplay.grid(row=2, column=0, padx=(25, 5), pady=(2, 10), sticky="w")

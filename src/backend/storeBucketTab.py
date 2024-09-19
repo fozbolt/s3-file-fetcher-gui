@@ -29,6 +29,7 @@ class StoreBucketTab:
         self.tab.grid_columnconfigure(0, weight=1)
 
         self.storeRadioVar = customtkinter.StringVar(value="prod")
+        self.storeRadioVar.trace_add("write", self.onRadioChange)
         self.createStoreRadioFrame(self.tab, self.storeRadioVar, [("Prod", "prod"), ("Stage", "stage"), ("Dev", "dev")])
 
         self.storeIdPlaceholder = customtkinter.CTkEntry(self.tab, placeholder_text="Submit storeId to view", state="disabled", width=300)
@@ -126,6 +127,10 @@ class StoreBucketTab:
         self.updateTextboxStore(content, status)
         self.updateEntry(self.storeIdPlaceholder, fileName)
         self.updateEntry(self.convertedStoreIdPlaceholder, backendHelperFunctions.getFilePath(fileName))
+
+    #test
+    def onRadioChange(self, *args):
+        self.updateEntry(self.reverseCheckCmdEntry, backendHelperFunctions.createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 
 
     def deleteStoreBucketHistory(self, folderName, scrollableFrame):
