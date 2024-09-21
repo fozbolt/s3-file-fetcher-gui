@@ -3,7 +3,7 @@ from environment import loadEnvironmentKeys
 
 def connectToS3(environmentName):
     environmentVars = loadEnvironmentKeys(environmentName)
-
+  
     return boto3.client(
         's3',
         aws_access_key_id=environmentVars["awsAccesKeyId"],

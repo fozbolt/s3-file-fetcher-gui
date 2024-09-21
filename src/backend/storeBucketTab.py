@@ -38,9 +38,14 @@ class StoreBucketTab:
         self.convertedStoreIdPlaceholder = customtkinter.CTkEntry(self.tab, placeholder_text="Submit storeId to view", state="disabled", width=300)
         self.convertedStoreIdPlaceholder.grid(row=4, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
-        self.reverseCheckCmdEntry = customtkinter.CTkEntry(self.tab, placeholder_text="Reverse check command", state="disabled", width=600)
-        self.reverseCheckCmdEntry.grid(row=6, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
+        self.reverseCheckFrame = customtkinter.CTkFrame(self.tab)
+        self.reverseCheckFrame.grid(row=6, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
+        self.reverseCheckCmdEntry = customtkinter.CTkEntry(self.reverseCheckFrame, placeholder_text="Reverse check command", state="disabled", width=600)
+        self.reverseCheckCmdEntry.grid(row=0, column=0, sticky="w")
+
+        self.copyButton = customtkinter.CTkButton(self.reverseCheckFrame, text="Copy", command=self.copyReverseCheckCmd, width=50)
+        self.copyButton.grid(row=0, column=1, padx=(5, 0), sticky="w")
         self.createStoreLabelsAndEntries()
 
         self.storeTextbox = customtkinter.CTkTextbox(self.tab, width=250, height=150)
@@ -66,15 +71,20 @@ class StoreBucketTab:
         self.tab.grid_rowconfigure((0,7), weight=0)
         self.tab.grid_rowconfigure(7, weight=1)
 
-
         storeLabel1 = customtkinter.CTkLabel(self.tab, text="1. storeId:", anchor="w")
         storeLabel1.grid(row=1, column=0, padx=(25, 5), pady=(20, 2), sticky="w")
 
         storeLabel2 = customtkinter.CTkLabel(self.tab, text="2. S3 bucket key (file location)", anchor="w")
         storeLabel2.grid(row=3, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
 
-        reverseCheckCmdLabel = customtkinter.CTkLabel(self.tab, text="ADDITIONAL: reverse check terminal command", anchor="w")
+        reverseCheckCmdLabel = customtkinter.CTkLabel(self.tab, text="Reverse check terminal command", anchor="w")
         reverseCheckCmdLabel.grid(row=5, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
+
+    def copyReverseCheckCmd(self):
+        reverseCheckCmd = self.reverseCheckCmdEntry.get()
+        self.tab.clipboard_clear()
+        self.tab.clipboard_append(reverseCheckCmd)
+        self.tab.update()
 
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()
@@ -101,7 +111,16 @@ class StoreBucketTab:
             self.storeTextbox.configure(text_color="red")
 
         self.storeTextbox.insert(customtkinter.END, message)
-        self.storeTextbox.configure(state="readonly")
+        
+        # textbox doesnt support readonly type
+        # prevents users from typing anything inside the CTkTextbox widget, effectively making it "readonly" from a user interaction perspective.
+        self.storeTextbox.bind("<Key>", lambda e: "break")  # Block key presses to prevent typing
+
+        # Allow selecting text and copying using Ctrl+C or Cmd+C
+        self.storeTextbox.bind("<Control-c>", lambda e: self.tab.clipboard_append(self.storeTextbox.selection_get()))
+        self.storeTextbox.bind("<Command-c>", lambda e: self.tab.clipboard_append(self.storeTextbox.selection_get()))
+
+        self.storeTextbox.configure(state="disabled")
 
 
     def openFile(self, fileName, folder):
@@ -128,7 +147,6 @@ class StoreBucketTab:
         self.updateEntry(self.storeIdPlaceholder, fileName)
         self.updateEntry(self.convertedStoreIdPlaceholder, backendHelperFunctions.getFilePath(fileName))
 
-    #test
     def onRadioChange(self, *args):
         self.updateEntry(self.reverseCheckCmdEntry, backendHelperFunctions.createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 

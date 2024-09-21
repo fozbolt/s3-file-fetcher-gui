@@ -8,7 +8,6 @@ import argparse
 def fetchVehicleData(environmentName, storeId):
     try: 
         convertedStoreId = getFilePath(storeId)
-        
         response = connectToS3(environmentName).get_object(Bucket=os.environ["AWS_STORE_BUCKET_NAME"], Key=convertedStoreId)
         result = json.load(response["Body"])
 

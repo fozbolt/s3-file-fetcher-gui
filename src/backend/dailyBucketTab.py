@@ -29,7 +29,8 @@ class DailyBucketTab:
         self.tab.grid_columnconfigure(0, weight=1)
 
         self.dailyRadioVar = customtkinter.StringVar(value="prod")
-        self.createDailyRadioFrame(self.tab, ["Prod", "Stage", "Dev"])
+        # self.dailyRadioVar.trace_add("write", self.onRadioChange)
+        self.createDailyRadioFrame(self.tab, self.dailyRadioVar, [("Prod", "prod"), ("Stage", "stage"), ("Dev", "dev")])
 
         self.dailyEntryDisplay = customtkinter.CTkEntry(self.tab, placeholder_text="Submit daily bucket data", state="disabled", width=300)
         self.dailyEntryDisplay.grid(row=2, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
@@ -64,11 +65,11 @@ class DailyBucketTab:
         self.mainButton = customtkinter.CTkButton(self.tab, text="Submit", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), command=self.submit)
         self.mainButton.grid(row=6, column=2, padx=(20, 20), pady=(20, 5), sticky="nsew")
 
-    def createDailyRadioFrame(self, tab, options):
-        self.radioFrame = customtkinter.CTkFrame(tab)
-        self.radioFrame.grid(row=0, column=0, padx=5, pady=(10, 5), sticky="ew")
-        for i, text in enumerate(options):
-            radio = customtkinter.CTkRadioButton(self.radioFrame, text=text, variable=self.dailyRadioVar, value=text, height=20, width=60, radiobutton_width=10, radiobutton_height=10)
+    def createDailyRadioFrame(self, tab, variable, options):
+        self.dailyRadioFrame = customtkinter.CTkFrame(tab)
+        self.dailyRadioFrame.grid(row=0, column=0, padx=5, pady=(10, 5), sticky="ew")
+        for i, (text, value) in enumerate(options):
+            radio = customtkinter.CTkRadioButton(self.dailyRadioFrame, text=text, variable=variable, value=value, height=20, width=60, radiobutton_width=10, radiobutton_height=10)
             radio.grid(row=0, column=i, padx=2, pady=5, sticky="w")
 
     def createDailyBucketLabelsAndEntries(self):
@@ -96,6 +97,9 @@ class DailyBucketTab:
         self.dailyBucketIDEntry.delete(0, 'end')
         self.dailyBucketIDEntry.insert(0, "Default converted bucket ID")
         self.dailyBucketIDEntry.configure(state="readonly")
+
+    # def onRadioChange(self, *args):
+    #     self.updateEntry(self.reverseCheckCmdEntry, backendHelperFunctions.createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()
