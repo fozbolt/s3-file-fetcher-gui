@@ -104,7 +104,8 @@ class DailyBucketTab:
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()
         self.updateEntry(self.dailyEntryDisplay, inputText)
-        self.updateEntry(self.dailyBucketIDEntry, backendHelperFunctions.generateDailyBucketParams(inputText))
+        # TODO fix this
+        # self.updateEntry(self.dailyBucketIDEntry, backendHelperFunctions.generateDailyBucketParams(inputText))
 
         if not inputText:
             self.updateTextboxDaily('', '')

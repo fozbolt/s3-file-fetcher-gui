@@ -1,14 +1,16 @@
 import os
-from connection import connectToS3
+from connection import s3GetClient
 from backendHelperFunctions import createDirectory,createUniqueFileName, generateDailyBucketParams, saveAndOpenFile
 import argparse
 import json
 
 
 def fetchVehicleRawResponse(environmentName, date, vehicleUrl, vehicleUrlBody):
+    s3Client = s3GetClient(environmentName)
+
     dailyBucketParams = generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date)
 
-    response = connectToS3(environmentName).get_object(Bucket=os.environ["AWS_DAILY_CACHE_BUCKET_NAME"], Key=dailyBucketParams["dailyBucketKeyPrefix"])
+    response = s3Client.get_object(Bucket=os.environ["AWS_DAILY_CACHE_BUCKET_NAME"], Key=dailyBucketParams["dailyBucketKeyPrefix"])
     result = json.load(response["Body"])
 
     dailyBucketPath = createDirectory("dailyBucket")
