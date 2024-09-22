@@ -1,6 +1,6 @@
 import customtkinter
-import backendHelperFunctions
-import dailyBucket
+from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory
+from src.backend import dailyBucket
 import os
 import subprocess
 
@@ -13,7 +13,7 @@ class DailyBucketTab:
         self.sidebarFrameSwitches = []
 
     def createSidebarButtons(self, scrollableFrame, folderName):
-        dailyBucketFileNames = backendHelperFunctions.getSortedBucketFileNames(folderName)
+        dailyBucketFileNames = getSortedBucketFileNames(folderName)
         
         for i, fileName in enumerate(dailyBucketFileNames):
             button = customtkinter.CTkButton(
@@ -160,7 +160,7 @@ class DailyBucketTab:
         message_label.pack(padx=20, pady=20)
 
     def deleteDailyBucketHistory(self, folderName, scrollableFrame):
-        result = backendHelperFunctions.deleteBucketHistory(self, folderName)
+        result = deleteBucketHistory(self, folderName)
         self.updateTextboxDaily(result['message'], result['status'])
 
         if (result["status"] == "success"):

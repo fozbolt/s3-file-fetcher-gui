@@ -1,6 +1,6 @@
 import os
-from connection import s3GetClient
-from backendHelperFunctions import createDirectory,createUniqueFileName, generateDailyBucketParams, saveAndOpenFile
+from .connection import s3GetClient
+from .backendHelperFunctions import createDirectory,createUniqueFileName, generateDailyBucketParams, saveAndOpenFile
 import argparse
 import json
 

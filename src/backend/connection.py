@@ -1,5 +1,5 @@
 import boto3
-from environment import loadEnvironmentKeys
+from .environment import loadEnvironmentKeys
 
 class S3ConnectionManager:
     _instance = None

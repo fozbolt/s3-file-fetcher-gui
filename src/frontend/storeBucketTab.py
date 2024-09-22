@@ -1,6 +1,6 @@
 import customtkinter
-import backendHelperFunctions
-import storeBucket
+from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, createReverseCheckStoreCmd, getFilePath
+from src.backend import storeBucket
 import os
 import subprocess
 
@@ -13,7 +13,7 @@ class StoreBucketTab:
         self.sidebarFrameSwitches = []
 
     def createSidebarButtons(self, scrollableFrame, folderName):
-        dailyBucketFileNames = backendHelperFunctions.getSortedBucketFileNames(folderName)
+        dailyBucketFileNames = getSortedBucketFileNames(folderName)
 
         for i, fileName in enumerate(dailyBucketFileNames):
             button = customtkinter.CTkButton(
@@ -89,8 +89,8 @@ class StoreBucketTab:
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()
         self.updateEntry(self.storeIdPlaceholder, inputText)
-        self.updateEntry(self.convertedStoreIdPlaceholder, backendHelperFunctions.getFilePath(inputText))
-        self.updateEntry(self.reverseCheckCmdEntry, backendHelperFunctions.createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
+        self.updateEntry(self.convertedStoreIdPlaceholder, getFilePath(inputText))
+        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 
         if not inputText:
             self.updateTextboxStore('', '')
@@ -145,14 +145,14 @@ class StoreBucketTab:
     def updateExistingVehicleEntries(self, fileName, content, status):
         self.updateTextboxStore(content, status)
         self.updateEntry(self.storeIdPlaceholder, fileName)
-        self.updateEntry(self.convertedStoreIdPlaceholder, backendHelperFunctions.getFilePath(fileName))
+        self.updateEntry(self.convertedStoreIdPlaceholder, getFilePath(fileName))
 
     def onRadioChange(self, *args):
-        self.updateEntry(self.reverseCheckCmdEntry, backendHelperFunctions.createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
+        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 
 
     def deleteStoreBucketHistory(self, folderName, scrollableFrame):
-        result = backendHelperFunctions.deleteBucketHistory(self, folderName)
+        result = deleteBucketHistory(self, folderName)
         self.updateTextboxStore(result['message'], result['status'])
 
         if (result["status"] == "success"):

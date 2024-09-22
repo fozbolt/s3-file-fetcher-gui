@@ -1,8 +1,8 @@
 import os
 import json
-from backendHelperFunctions import getFilePath, createDirectory, createUniqueFileName, saveAndOpenFile
+from .backendHelperFunctions import getFilePath, createDirectory, createUniqueFileName, saveAndOpenFile
 import argparse
-from connection import s3GetClient
+from .connection import s3GetClient
 
 
 def fetchVehicleData(environmentName, storeId):
