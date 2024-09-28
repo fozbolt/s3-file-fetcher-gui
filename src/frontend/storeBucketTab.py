@@ -32,16 +32,16 @@ class StoreBucketTab:
         self.storeRadioVar.trace_add("write", self.onRadioChange)
         self.createStoreRadioFrame(self.tab, self.storeRadioVar, [("Prod", "prod"), ("Stage", "stage"), ("Dev", "dev")])
 
-        self.storeIdPlaceholder = customtkinter.CTkEntry(self.tab, placeholder_text="Submit storeId to view", state="disabled", width=300)
+        self.storeIdPlaceholder = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
         self.storeIdPlaceholder.grid(row=2, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
-        self.convertedStoreIdPlaceholder = customtkinter.CTkEntry(self.tab, placeholder_text="Submit storeId to view", state="disabled", width=300)
+        self.convertedStoreIdPlaceholder = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
         self.convertedStoreIdPlaceholder.grid(row=4, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
         self.reverseCheckFrame = customtkinter.CTkFrame(self.tab)
         self.reverseCheckFrame.grid(row=6, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
-        self.reverseCheckCmdEntry = customtkinter.CTkEntry(self.reverseCheckFrame, placeholder_text="Reverse check command", state="disabled", width=600)
+        self.reverseCheckCmdEntry = customtkinter.CTkEntry(self.reverseCheckFrame, state="disabled", width=600)
         self.reverseCheckCmdEntry.grid(row=0, column=0, sticky="w")
 
         self.copyButton = customtkinter.CTkButton(self.reverseCheckFrame, text="Copy", command=self.copyReverseCheckCmd, width=50)
@@ -85,6 +85,12 @@ class StoreBucketTab:
         self.tab.clipboard_clear()
         self.tab.clipboard_append(reverseCheckCmd)
         self.tab.update()
+
+    def setDefaultstoreBucketEntryValues(self):
+        self.storeIdPlaceholder.configure(state="normal")
+        self.storeIdPlaceholder.delete(0, 'end')
+        self.storeIdPlaceholder.insert(0, "Paste the storeId at the bottom input to view")
+        self.storeIdPlaceholder.configure(state="readonly")
 
     def updateEntries(self, event=None):
         inputText = self.entryInput.get()

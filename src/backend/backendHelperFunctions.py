@@ -33,7 +33,7 @@ def createUniqueFileName(storeBucketPath, storeId):
     return os.path.join(storeBucketPath, f"{storeId}_{timestamp}")
 
 def generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date):
-    vehicleUrlWithBody = f"{vehicleUrl}{vehicleUrlBody}" 
+    vehicleUrlWithBody = f"{vehicleUrl}_{vehicleUrlBody}" 
 
     md5_hash = hashlib.md5()
     md5_hash.update(vehicleUrlWithBody.encode())

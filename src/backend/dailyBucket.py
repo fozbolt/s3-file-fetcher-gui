@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('env', type=str, help='Environment (dev, stage, prod)')
     parser.add_argument('date', type=str, help='date in format YYYYMMDD, example: 20240821')
     parser.add_argument('vehicleUrl', type=str, help='The URL of the vehicle to process')
-    parser.add_argument('vehicleUrlBody', type=str, nargs='?', default="_undefined", help='The body of the URL of the vehicle to process (optional)')
+    parser.add_argument('vehicleUrlBody', type=str, nargs='?', default="undefined", help='The body of the URL of the vehicle to process (optional)')
 
     args = parser.parse_args()
 
