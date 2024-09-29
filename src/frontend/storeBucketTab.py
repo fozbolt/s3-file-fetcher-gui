@@ -1,5 +1,5 @@
 import customtkinter
-from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, createReverseCheckStoreCmd, getFilePath
+from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, createReverseCheckStoreBucketCmd, getFilePath
 from src.backend import storeBucket
 import os
 import subprocess
@@ -38,19 +38,25 @@ class StoreBucketTab:
         self.convertedStoreIdPlaceholder = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
         self.convertedStoreIdPlaceholder.grid(row=4, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
+        self.createReverseCheckStoreCmdElements()
+        self.createStoreLabels()
+
+        self.storeTextbox = customtkinter.CTkTextbox(self.tab, width=250, height=150)
+        self.storeTextbox.configure(state="disabled")
+        self.storeTextbox.grid(row=7, column=0, padx=(20,0), pady=(50, 10), sticky="nsew")
+
+    def createReverseCheckStoreCmdElements(self):
         self.reverseCheckFrame = customtkinter.CTkFrame(self.tab)
         self.reverseCheckFrame.grid(row=6, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
+
+        self.reverseCheckFrame.grid_columnconfigure(0, weight=1)
+        self.reverseCheckFrame.grid_columnconfigure(1, weight=0)
 
         self.reverseCheckCmdEntry = customtkinter.CTkEntry(self.reverseCheckFrame, state="disabled", width=600)
         self.reverseCheckCmdEntry.grid(row=0, column=0, sticky="w")
 
         self.copyButton = customtkinter.CTkButton(self.reverseCheckFrame, text="Copy", command=self.copyReverseCheckCmd, width=50)
         self.copyButton.grid(row=0, column=1, padx=(5, 0), sticky="w")
-        self.createStoreLabelsAndEntries()
-
-        self.storeTextbox = customtkinter.CTkTextbox(self.tab, width=250, height=150)
-        self.storeTextbox.configure(state="disabled")
-        self.storeTextbox.grid(row=7, column=0, padx=20, pady=(50, 10), sticky="nsew")
 
     def createMainWidgets(self):
         self.entryInput = customtkinter.CTkEntry(self.tab, placeholder_text="storeId")
@@ -67,7 +73,7 @@ class StoreBucketTab:
             radio = customtkinter.CTkRadioButton(self.storeRadioFrame, text=text, variable=variable, value=value, height=20, width=60, radiobutton_width=10, radiobutton_height=10)
             radio.grid(row=0, column=i, padx=2, pady=5, sticky="w")
 
-    def createStoreLabelsAndEntries(self):
+    def createStoreLabels(self):
         self.tab.grid_rowconfigure((0,7), weight=0)
         self.tab.grid_rowconfigure(7, weight=1)
 
@@ -88,7 +94,7 @@ class StoreBucketTab:
 
     def setDefaultstoreBucketEntryValues(self):
         self.storeIdPlaceholder.configure(state="normal")
-        self.storeIdPlaceholder.delete(0, 'end')
+        self.storeIdPlaceholder.delete(0, "end")
         self.storeIdPlaceholder.insert(0, "Paste the storeId at the bottom input to view")
         self.storeIdPlaceholder.configure(state="readonly")
 
@@ -96,14 +102,14 @@ class StoreBucketTab:
         inputText = self.entryInput.get()
         self.updateEntry(self.storeIdPlaceholder, inputText)
         self.updateEntry(self.convertedStoreIdPlaceholder, getFilePath(inputText))
-        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
+        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreBucketCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 
         if not inputText:
-            self.updateTextboxStore('', '')
+            self.updateTextboxStore("", "")
 
     def updateEntry(self, entry, text):
         entry.configure(state="normal")
-        entry.delete(0, 'end')
+        entry.delete(0, "end")
         entry.insert(0, text)
         entry.configure(state="readonly")
 
@@ -135,10 +141,11 @@ class StoreBucketTab:
             script_dir = os.path.dirname(os.path.realpath(__file__))
             
             filePath = os.path.join(script_dir, folder, fileName)
+            filePath = filePath.replace("frontend", "backend") #TODO temp fix due to folder restructuring, improve later
 
-            subprocess.Popen(['open', filePath])
+            subprocess.Popen(["open", filePath])
 
-            with open(filePath, 'r') as file:
+            with open(filePath, "r") as file:
                 content = file.read()
                 self.updateExistingVehicleEntries(fileName.split("_")[0], content, "success")
 
@@ -154,12 +161,12 @@ class StoreBucketTab:
         self.updateEntry(self.convertedStoreIdPlaceholder, getFilePath(fileName))
 
     def onRadioChange(self, *args):
-        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
+        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreBucketCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
 
 
     def deleteStoreBucketHistory(self, folderName, scrollableFrame):
         result = deleteBucketHistory(self, folderName)
-        self.updateTextboxStore(result['message'], result['status'])
+        self.updateTextboxStore(result["message"], result["status"])
 
         if (result["status"] == "success"):
             self.createSidebarButtons(scrollableFrame, folderName)
@@ -168,4 +175,4 @@ class StoreBucketTab:
         storeId = self.storeIdPlaceholder.get()
         environmentName = self.storeRadioVar.get()
         result = storeBucket.fetchVehicleData(environmentName, storeId)
-        self.updateTextboxStore(result['message'], result['status'])
+        self.updateTextboxStore(result["message"], result["status"])

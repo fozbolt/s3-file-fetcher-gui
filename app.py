@@ -18,7 +18,7 @@ class App(customtkinter.CTk):
 
     def configureWindow(self):
         self.title("s3 file fetcher.py")
-        self.geometry(f"{1375}x{800}")
+        self.geometry(f"{1500}x{800}")
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure((2, 3), weight=0)
         self.grid_rowconfigure((0, 1, 2), weight=1)

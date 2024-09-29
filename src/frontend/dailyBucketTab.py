@@ -1,5 +1,5 @@
 import customtkinter
-from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, generateDailyBucketParams
+from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, generateDailyBucketParams, createReverseCheckDailyBucketCmd
 from src.backend import dailyBucket
 import os
 import subprocess
@@ -26,50 +26,62 @@ class DailyBucketTab:
 
     def createWidgets(self):
         self.tab.grid_rowconfigure(11, weight=1)
-        self.tab.grid_columnconfigure(0, weight=1)
+        self.tab.grid_columnconfigure((0,1), weight=1)
 
         self.dailyRadioVar = customtkinter.StringVar(value="prod")
-        # self.dailyRadioVar.trace_add("write", self.onRadioChange)
+        self.dailyRadioVar.trace_add("write", self.onRadioChange)
         self.createDailyRadioFrame(self.tab, self.dailyRadioVar, [("Prod", "prod"), ("Stage", "stage"), ("Dev", "dev")])
 
-        self.dailyEntryDisplay = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
+        self.dailyEntryDisplay = customtkinter.CTkEntry(self.tab, state="disabled", width=400)
         self.dailyEntryDisplay.grid(row=2, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
-        self.dailyUrlWithBody = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
-        self.dailyUrlWithBody.grid(row=4, column=0, padx=(25, 0), pady=(2, 10), sticky="w")
+        self.dailyUrlWithBodyAndButtonFrame = customtkinter.CTkFrame(self.tab)
+        self.dailyUrlWithBodyAndButtonFrame.grid(row=4, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
-        self.dailyBucketPopupButton = customtkinter.CTkButton(self.tab, text="Show all", command=self.showDailyBucketPopup)
-        self.dailyBucketPopupButton.grid(row=4, column=0, padx=(350, 0), pady=(2, 10), sticky="w")  # Positioned next to dailyUrlWithBody
+        self.dailyUrlWithBody = customtkinter.CTkEntry(self.dailyUrlWithBodyAndButtonFrame, state="disabled", width=400)
+        self.dailyUrlWithBody.grid(row=0, column=0, padx=(0, 0), pady=(0, 0), sticky="w")
 
-        self.dailyEntryDisplay1 = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
-        self.dailyEntryDisplay1.grid(row=6, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
+        self.dailyBucketPopupButton = customtkinter.CTkButton(self.dailyUrlWithBodyAndButtonFrame, text="Show all", command=self.showDailyBucketPopup, width=50)
+        self.dailyBucketPopupButton.grid(row=0, column=1, padx=(5 ,0), pady=(0, 0), sticky="w")
 
-        self.dailyEntryDisplay2 = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
-        self.dailyEntryDisplay2.grid(row=8, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
+        self.hashedUrlAndBodyEntry = customtkinter.CTkEntry(self.tab, state="disabled", width=400)
+        self.hashedUrlAndBodyEntry.grid(row=6, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
-        self.dailyEntryDisplay3 = customtkinter.CTkEntry(self.tab, state="disabled", width=300)
-        self.dailyEntryDisplay3.grid(row=10, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
-        
-        self.createDailyBucketLabelsAndEntries()
+        self.dateAndHashedUrlEntry = customtkinter.CTkEntry(self.tab, state="disabled", width=400)
+        self.dateAndHashedUrlEntry.grid(row=8, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
 
-        self.dailyTextbox = customtkinter.CTkTextbox(self.tab, width=250, height=150)
+        self.createReverseCheckCmdElements()
+        self.createDailyBucketLabels()
+
+        self.dailyTextbox = customtkinter.CTkTextbox(self.tab, width=700, height=150)
         self.dailyTextbox.configure(state="disabled")
-        self.dailyTextbox.grid(row=11, column=0, padx=20, pady=(50, 10), sticky="nsew")
+        self.dailyTextbox.grid(row=11, column=0, padx=(20,5), pady=(50, 10), sticky="nsew")
+
+    def createReverseCheckCmdElements(self):
+        self.reverseDailyCheckFrame = customtkinter.CTkFrame(self.tab)
+        self.reverseDailyCheckFrame.grid(row=10, column=0, padx=(25, 5), pady=(2, 10), sticky="w")
+
+        self.reverseDailyCheckFrame.grid_columnconfigure(0, weight=1)
+        self.reverseDailyCheckFrame.grid_columnconfigure(1, weight=0)
+
+        self.reverseDailyCheckCmdEntry = customtkinter.CTkEntry(self.reverseDailyCheckFrame, state="disabled", width=700)
+        self.reverseDailyCheckCmdEntry.grid(row=0, column=0, sticky="w")
+
+        self.copyDailyReverseCheckButton = customtkinter.CTkButton(self.reverseDailyCheckFrame, text="Copy", command=self.copyReverseCheckCmd, width=50)
+        self.copyDailyReverseCheckButton.grid(row=0, column=1, padx=(5, 0), sticky="w")
 
     def createMainWidgets(self):
-        # Adjust the width attribute to make the entryInput thinner
-        self.entryInput = customtkinter.CTkEntry(self.tab, placeholder_text="url", width=150)
-        self.entryInput.grid(row=12, column=0, padx=(20, 5), pady=(20, 5), sticky="ew")
+        self.tab.grid_columnconfigure(0, weight=2)
+        self.tab.grid_columnconfigure(1, weight=1, minsize=110)  # date column with a minimum width
+        self.tab.grid_columnconfigure(2, weight=0)
+
+        self.entryInput = customtkinter.CTkEntry(self.tab, placeholder_text="{url}_{body}", width=700)
+        self.entryInput.grid(row=12, column=0, padx=(20, 5), pady=(20, 5), sticky="w")
         self.entryInput.bind("<KeyRelease>", self.updateEntries)
 
-        self.dateInput = customtkinter.CTkEntry(self.tab, placeholder_text="date as YYYYMMDD", width=150)
+        self.dateInput = customtkinter.CTkEntry(self.tab, placeholder_text="YYYYMMDD", width=150)
         self.dateInput.grid(row=12, column=1, padx=(5, 10), pady=(20, 5), sticky="ew")
         self.dateInput.bind("<KeyRelease>", self.updateEntries)
-
-        # Configure column weights to ensure they expand properly
-        self.tab.grid_columnconfigure(0, weight=1)
-        self.tab.grid_columnconfigure(1, weight=1)
-
 
         self.mainButton = customtkinter.CTkButton(self.tab, text="Submit", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), command=self.submit)
         self.mainButton.grid(row=12, column=2, padx=(20, 20), pady=(20, 5), sticky="nsew")
@@ -81,60 +93,66 @@ class DailyBucketTab:
             radio = customtkinter.CTkRadioButton(self.dailyRadioFrame, text=text, variable=variable, value=value, height=20, width=60, radiobutton_width=10, radiobutton_height=10)
             radio.grid(row=0, column=i, padx=2, pady=5, sticky="w")
 
-    def createDailyBucketLabelsAndEntries(self):
+    def createDailyBucketLabels(self):
         self.tab.grid_rowconfigure((0,10), weight=0)
         self.tab.grid_rowconfigure(11, weight=1)
 
-        #TODO change names to sth descriptive
-        dailyLabel1 = customtkinter.CTkLabel(self.tab, text="1. url:", anchor="w")
-        dailyLabel1.grid(row=1, column=0, padx=(25, 5), pady=(20, 2), sticky="w")
+        dailyEntryDisplay = customtkinter.CTkLabel(self.tab, text="1. url", anchor="w")
+        dailyEntryDisplay.grid(row=1, column=0, padx=(25, 5), pady=(20, 2), sticky="w")
 
-        dailyLabel2 = customtkinter.CTkLabel(self.tab, text="2. url with body (htttps..._undefined or body), create pop to see it...", anchor="w")
-        dailyLabel2.grid(row=3, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
+        dailyUrlWithBody = customtkinter.CTkLabel(self.tab, text="2. url with body", anchor="w")
+        dailyUrlWithBody.grid(row=3, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
 
-        dailyLabel3 = customtkinter.CTkLabel(self.tab, text="3. hashed url and body", anchor="w")
-        dailyLabel3.grid(row=5, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
+        hashedUrlAndBodyEntry = customtkinter.CTkLabel(self.tab, text="3. hashed url and body", anchor="w")
+        hashedUrlAndBodyEntry.grid(row=5, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
 
-        dailyLabel4 = customtkinter.CTkLabel(self.tab, text="4. date/hashed url with body...", anchor="w")
-        dailyLabel4.grid(row=7, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
+        dateAndHashedUrlEntry = customtkinter.CTkLabel(self.tab, text="4. date and hashed url with body", anchor="w")
+        dateAndHashedUrlEntry.grid(row=7, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
 
-        dailyLabel5 = customtkinter.CTkLabel(self.tab, text="Reverse check terminal command", anchor="w")
-        dailyLabel5.grid(row=9, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
+        reverseDailyCheckCmdEntry = customtkinter.CTkLabel(self.tab, text="Reverse check terminal command", anchor="w")
+        reverseDailyCheckCmdEntry.grid(row=9, column=0, padx=(25, 5), pady=(10, 2), sticky="w")
 
     def setDefaulDailyBucketEntryValues(self):
         self.dailyEntryDisplay.configure(state="normal")
-        self.dailyEntryDisplay.delete(0, 'end')
+        self.dailyEntryDisplay.delete(0, "end")
         self.dailyEntryDisplay.insert(0, "Paste the url at the bottom input to view")
         self.dailyEntryDisplay.configure(state="readonly")
 
-    # def onRadioChange(self, *args):
-    #     self.updateEntry(self.reverseCheckCmdEntry, backendHelperFunctions.createReverseCheckStoreCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
+    def copyReverseCheckCmd(self):
+        reverseCheckCmd = self.reverseDailyCheckCmdEntry.get()
+        self.tab.clipboard_clear()
+        self.tab.clipboard_append(reverseCheckCmd)
+        self.tab.update()
+
+    def onRadioChange(self, *args):
+        self.updateEntry(self.reverseDailyCheckCmdEntry, createReverseCheckDailyBucketCmd(self.dailyRadioVar.get(), self.dateAndHashedUrlEntry.get()))
 
     def updateEntries(self, event=None):
-        urlWithBody = self.dailyEntryDisplay.get()
-        url, vehicleUrlBody = (urlWithBody.rsplit("_", 1) if "_" in urlWithBody else (urlWithBody, 'undefined')) #TODO this is bad practice, improve
+        urlWithBody = self.entryInput.get()
+        url, vehicleUrlBody = (urlWithBody.rsplit("_", 1) if "_" in urlWithBody else (urlWithBody, "undefined")) #TODO this is bad practice, improve
         dateInput = self.dateInput.get()
         self.updateEntry(self.dailyEntryDisplay, url)
-        # i tu stao 
+
         vehicleUrlWithBody = f"{url}_{vehicleUrlBody}" #ovo staviti u backend funkciju zbog logike s undefiend?
     
         self.updateEntry(self.dailyUrlWithBody, vehicleUrlWithBody)
-        #tu stao
-        #
-        ##tu dobijem hashed url..
-        entryInputChangeThisName = generateDailyBucketParams(url, vehicleUrlBody, dateInput)
-        print(entryInputChangeThisName)
-        # self.updateEntry(self.dailyUrlWithBody, )
+    
+        dailyBucketParams = generateDailyBucketParams(url, vehicleUrlBody, dateInput)
+        self.updateEntry(self.hashedUrlAndBodyEntry, dailyBucketParams["vehicleUrlHashed"])
+        self.updateEntry(self.dateAndHashedUrlEntry, dailyBucketParams["dailyBucketKeyPrefix"])
 
-        # TODO fix this
-        # self.updateEntry(self.dailyUrlWithBody, backendHelperFunctions.generateDailyBucketParams(inputText))
-
+        self.updateEntry(self.reverseDailyCheckCmdEntry, createReverseCheckDailyBucketCmd(self.dailyRadioVar.get(), self.dateAndHashedUrlEntry.get()))
+       
         if not urlWithBody:
-            self.updateTextboxDaily('', '')
+            self.updateTextboxDaily("", "")
+            self.updateEntry(self.dailyUrlWithBody, "")
+            self.updateEntry(self.hashedUrlAndBodyEntry, "")
+            self.updateEntry(self.dateAndHashedUrlEntry, "")
+            self.updateEntry(self.reverseDailyCheckCmdEntry, "")
 
     def updateEntry(self, entry, text):
         entry.configure(state="normal")
-        entry.delete(0, 'end')
+        entry.delete(0, "end")
         entry.insert(0, text)
         entry.configure(state="readonly")
 
@@ -152,19 +170,19 @@ class DailyBucketTab:
 
 
     def openFile(self, fileName, folder):
-        ## add here logic for sending tab info and showing tab info...
         try:
             # Get the directory where the current script (app.py) is located
             script_dir = os.path.dirname(os.path.realpath(__file__))
             
-            # Construct the relative file path based on the script's location
+            # construct the relative file path based on the script"s location
             filePath = os.path.join(script_dir, folder, fileName)
+            filePath = filePath.replace("frontend", "backend") #TODO temp fix due to folder restructuring, improve later
 
-            subprocess.Popen(['open', filePath])
+            subprocess.Popen(["open", filePath])
 
-            with open(filePath, 'r') as file:
+            with open(filePath, "r") as file:
                 content = file.read()
-                # Display the content in the daily tab's textbox or wherever appropriate
+                # display the content in the daily tab"s textbox
                 self.updateTextboxDaily(content, "success")
 
         except Exception as e:
@@ -183,17 +201,17 @@ class DailyBucketTab:
 
     def deleteDailyBucketHistory(self, folderName, scrollableFrame):
         result = deleteBucketHistory(self, folderName)
-        self.updateTextboxDaily(result['message'], result['status'])
+        self.updateTextboxDaily(result["message"], result["status"])
 
         if (result["status"] == "success"):
             self.createSidebarButtons(scrollableFrame, folderName)
 
     def submit(self):
-        urlWithBody = self.dailyEntryDisplay.get()
+        urlWithBody = self.entryInput.get()
         url, vehicleUrlBody = (urlWithBody.rsplit("_", 1) if "_" in urlWithBody else (urlWithBody, None))
         environmentName = self.dailyRadioVar.get()
         date = self.dateInput.get()
-
+    
         result = dailyBucket.fetchVehicleRawResponse(environmentName, date, url, vehicleUrlBody) #test what happens if no date is entered, possibly create restriction
         self.updateTextboxDaily(result["message"], result["status"])
 

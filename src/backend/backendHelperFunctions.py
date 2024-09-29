@@ -138,8 +138,17 @@ def deleteBucketHistory(self, folderName):
         }
     
     
-def createReverseCheckStoreCmd(environmentName, filePath):
-    #radi, ali promjena environmenta ne updejta stanje
+def createReverseCheckStoreBucketCmd(environmentName, filePath):
     bucketName = loadEnvironmentName(environmentName, 'storeBucket')
+    if environmentName == "dev": 
+        return f"aws --endpoint-url=http://localhost:4566 s3 cp s3://{bucketName}/{filePath} ./"
+    else:
+        return f"aws s3 cp s3://{bucketName}/{filePath} ./"
 
-    return f"aws s3 cp s3://{bucketName}/{filePath} ./"
+
+def createReverseCheckDailyBucketCmd(environmentName, filePath):
+    bucketName = loadEnvironmentName(environmentName, 'dailyBucket')
+    if environmentName == "dev": 
+        return f"aws --endpoint-url=http://localhost:4566 s3 cp s3://{bucketName}/{filePath} ./"
+    else:
+        return f"aws s3 cp s3://{bucketName}/{filePath} ./"
