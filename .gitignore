@@ -4,6 +4,7 @@ storeBucket
 .env.prod
 .env.stage
 .env.dev
+output
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

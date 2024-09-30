@@ -15,7 +15,7 @@ class S3ConnectionManager:
                 
                 cls._s3Client = boto3.client(
                     's3',
-                    aws_access_key_id=environmentVars["awsAccesKeyId"],
+                    aws_access_key_id=environmentVars["awsAccessKeyId"],
                     aws_secret_access_key=environmentVars["awsSecretKey"],
                     endpoint_url=f"http://localhost:{environmentVars['awsLocalstackPort']}" if environmentVars.get("awsLocalstackPort") else None
                 )

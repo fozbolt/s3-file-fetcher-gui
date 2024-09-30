@@ -3,7 +3,7 @@ from datetime import datetime
 import hashlib
 import subprocess
 import json
-from .environment import loadEnvironmentName
+from .environment import loadBucketName
 
 # ee315ac12567a2b44ae03fc30b093334 -> e/e/3/ee315ac12567a2b44ae03fc30b093334
 # returns string alert if string doesn't look like storeId (dummy way of checking with length)
@@ -139,7 +139,7 @@ def deleteBucketHistory(self, folderName):
     
     
 def createReverseCheckStoreBucketCmd(environmentName, filePath):
-    bucketName = loadEnvironmentName(environmentName, 'storeBucket')
+    bucketName = loadBucketName(environmentName, 'storeBucket')
     if environmentName == "dev": 
         return f"aws --endpoint-url=http://localhost:4566 s3 cp s3://{bucketName}/{filePath} ./"
     else:
@@ -147,7 +147,7 @@ def createReverseCheckStoreBucketCmd(environmentName, filePath):
 
 
 def createReverseCheckDailyBucketCmd(environmentName, filePath):
-    bucketName = loadEnvironmentName(environmentName, 'dailyBucket')
+    bucketName = loadBucketName(environmentName, 'dailyBucket')
     if environmentName == "dev": 
         return f"aws --endpoint-url=http://localhost:4566 s3 cp s3://{bucketName}/{filePath} ./"
     else:

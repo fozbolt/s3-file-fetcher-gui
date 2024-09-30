@@ -31,6 +31,16 @@ Now you can use alias to fetch vehicle request raw response or vehicle data from
 
 environmentNames: dev, stage, prod
 
+##### creating executable file
+
+1. Install `auto-py-to-exe`.
+2. Run `auto-py-to-exe` to launch the GUI.
+3. Select your script, choose "One File", add an icon (optional), and click "Convert".
+4. Add .env files (prod,stage,dev)
+   - GUI -> additional files (doesn't show .env files so upload readme for example and then change name)
+   - CMD: pyinstaller --noconfirm --onedir --windowed --icon "/Users/{user name}/Downloads/60159_analysis_check_review_search_search docs_icon.ico" --add-data "/Users/{user name}/Projects/s3-file-fetcher-gui/.env.prod:." --add-data "/Users/{user name}/Projects/s3-file-fetcher-gui/.env.stage:." --add-data "/Users/{user name}/Projects/s3-file-fetcher-gui/.env.prod:." "/Users/{user name}/Projects/s3-file-fetcher-gui/app.py"
+5. Done! Your `.exe` is ready in the `dist` folder.
+
 ##### personal helper commands
 
 pip freeze > requirements.txt
