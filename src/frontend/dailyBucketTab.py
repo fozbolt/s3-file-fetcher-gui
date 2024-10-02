@@ -1,5 +1,5 @@
 import customtkinter
-from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, generateDailyBucketParams, createReverseCheckDailyBucketCmd
+from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, generateDailyBucketParams, createReverseCheckBucketCmd
 from src.backend import dailyBucket
 import os
 import subprocess
@@ -125,7 +125,7 @@ class DailyBucketTab:
         self.tab.update()
 
     def onRadioChange(self, *args):
-        self.updateEntry(self.reverseDailyCheckCmdEntry, createReverseCheckDailyBucketCmd(self.dailyRadioVar.get(), self.dateAndHashedUrlEntry.get()))
+        self.updateEntry(self.reverseDailyCheckCmdEntry, createReverseCheckBucketCmd(self.dailyRadioVar.get(), self.dateAndHashedUrlEntry.get(), 'dailyBucket'))
 
     def updateEntries(self, event=None):
         urlWithBody = self.entryInput.get()
@@ -141,7 +141,7 @@ class DailyBucketTab:
         self.updateEntry(self.hashedUrlAndBodyEntry, dailyBucketParams["vehicleUrlHashed"])
         self.updateEntry(self.dateAndHashedUrlEntry, dailyBucketParams["dailyBucketKeyPrefix"])
 
-        self.updateEntry(self.reverseDailyCheckCmdEntry, createReverseCheckDailyBucketCmd(self.dailyRadioVar.get(), self.dateAndHashedUrlEntry.get()))
+        self.updateEntry(self.reverseDailyCheckCmdEntry, createReverseCheckBucketCmd(self.dailyRadioVar.get(), self.dateAndHashedUrlEntry.get(), 'dailyBucket'))
        
         if not urlWithBody:
             self.updateTextboxDaily("", "")
@@ -166,12 +166,21 @@ class DailyBucketTab:
             self.dailyTextbox.configure(text_color="red")
 
         self.dailyTextbox.insert(customtkinter.END, message)
+
+        # textbox doesnt support readonly type
+        # prevents users from typing anything inside the CTkTextbox widget, effectively making it "readonly" from a user interaction perspective.
+        self.dailyTextbox.bind("<Key>", lambda e: "break")  # Block key presses to prevent typing
+
+        # Allow selecting text and copying using Ctrl+C or Cmd+C
+        self.dailyTextbox.bind("<Control-c>", lambda e: self.tab.clipboard_append(self.dailyTextbox.selection_get()))
+        self.dailyTextbox.bind("<Command-c>", lambda e: self.tab.clipboard_append(self.dailyTextbox.selection_get()))
+
         self.dailyTextbox.configure(state="disabled")
 
 
     def openFile(self, fileName, folder):
         try:
-            # Get the directory where the current script (app.py) is located
+            # get the directory where the current script (app.py) is located
             script_dir = os.path.dirname(os.path.realpath(__file__))
             
             # construct the relative file path based on the script"s location
@@ -212,6 +221,8 @@ class DailyBucketTab:
         environmentName = self.dailyRadioVar.get()
         date = self.dateInput.get()
     
-        result = dailyBucket.fetchVehicleRawResponse(environmentName, date, url, vehicleUrlBody) #test what happens if no date is entered, possibly create restriction
+        result = dailyBucket.fetchVehicleRawResponse(environmentName, date, url, vehicleUrlBody) #TODO test what happens if no date is entered, possibly create restriction
         self.updateTextboxDaily(result["message"], result["status"])
+
+        print(result)
 

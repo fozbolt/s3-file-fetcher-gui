@@ -138,16 +138,8 @@ def deleteBucketHistory(self, folderName):
         }
     
     
-def createReverseCheckStoreBucketCmd(environmentName, filePath):
-    bucketName = loadBucketName(environmentName, 'storeBucket')
-    if environmentName == "dev": 
-        return f"aws --endpoint-url=http://localhost:4566 s3 cp s3://{bucketName}/{filePath} ./"
-    else:
-        return f"aws s3 cp s3://{bucketName}/{filePath} ./"
-
-
-def createReverseCheckDailyBucketCmd(environmentName, filePath):
-    bucketName = loadBucketName(environmentName, 'dailyBucket')
+def createReverseCheckBucketCmd(environmentName, filePath, bucketName):
+    bucketName = loadBucketName(environmentName, bucketName)
     if environmentName == "dev": 
         return f"aws --endpoint-url=http://localhost:4566 s3 cp s3://{bucketName}/{filePath} ./"
     else:

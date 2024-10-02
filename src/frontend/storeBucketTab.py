@@ -1,5 +1,5 @@
 import customtkinter
-from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, createReverseCheckStoreBucketCmd, getFilePath
+from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteBucketHistory, createReverseCheckBucketCmd, getFilePath
 from src.backend import storeBucket
 import os
 import subprocess
@@ -102,10 +102,14 @@ class StoreBucketTab:
         inputText = self.entryInput.get()
         self.updateEntry(self.storeIdPlaceholder, inputText)
         self.updateEntry(self.convertedStoreIdPlaceholder, getFilePath(inputText))
-        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreBucketCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
+        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckBucketCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get(), 'storeBucket'))
 
         if not inputText:
             self.updateTextboxStore("", "")
+            self.updateEntry(self.storeIdPlaceholder, "")
+            self.updateEntry(self.convertedStoreIdPlaceholder, "")
+            self.updateEntry(self.reverseCheckCmdEntry, "")
+
 
     def updateEntry(self, entry, text):
         entry.configure(state="normal")
@@ -161,7 +165,7 @@ class StoreBucketTab:
         self.updateEntry(self.convertedStoreIdPlaceholder, getFilePath(fileName))
 
     def onRadioChange(self, *args):
-        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckStoreBucketCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get()))
+        self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckBucketCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get(), 'storeBucket'))
 
 
     def deleteStoreBucketHistory(self, folderName, scrollableFrame):

@@ -7,7 +7,7 @@
 3. source venv/bin/activate (for mac)
 4. pip install -r requirements.txt
 5. nano ~/.zshrc or nano ~/.bashrc
-6. add aliases
+6. add aliases (activate virtual environment and run given script in it)
    1. alias s3-dailyBucket="source /path/to/your/venv/bin/activate && python3 /path/to/your/script/dailyBucket.py" (full path)
    2. alias s3-storeBucket="source /path/to/your/venv/bin/activate && python3 /path/to/your/script/storeBucket.py" (full path)
 7. source ~/.zshrc or source ~/.bashrc

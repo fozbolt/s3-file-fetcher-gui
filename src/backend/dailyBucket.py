@@ -6,17 +6,30 @@ import json
 
 
 def fetchVehicleRawResponse(environmentName, date, vehicleUrl, vehicleUrlBody):
-    s3Client = s3GetClient(environmentName)
+    try:
+        s3Client = s3GetClient(environmentName)
 
-    dailyBucketParams = generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date)
+        dailyBucketParams = generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date)
 
-    response = s3Client.get_object(Bucket=os.environ["AWS_DAILY_CACHE_BUCKET_NAME"], Key=dailyBucketParams["dailyBucketKeyPrefix"])
-    result = json.load(response["Body"])
+        response = s3Client.get_object(Bucket=os.environ["AWS_DAILY_CACHE_BUCKET_NAME"], Key=dailyBucketParams["dailyBucketKeyPrefix"])
+        result = json.load(response["Body"])
 
-    dailyBucketPath = createDirectory("dailyBucket")
-    outputFileName = createUniqueFileName(dailyBucketPath, dailyBucketParams["vehicleUrlHashed"])
+        dailyBucketPath = createDirectory("dailyBucket")
+        outputFileName = createUniqueFileName(dailyBucketPath, dailyBucketParams["vehicleUrlHashed"])
 
-    saveAndOpenFile(outputFileName, result)
+        saveAndOpenFile(outputFileName, result)
+
+        return {
+                "message": f"Success: Data for url '{vehicleUrl}' fetched and saved successfully.", 
+                "status": "success"
+            }
+
+    except Exception as e:
+        # TODO separate aws boto errors, json errors and other erros
+        return {
+            "message": f"Error: An unexpected error occurred. {str(e)}", 
+            "status": "error"
+        }
 
 
 if __name__ == "__main__":

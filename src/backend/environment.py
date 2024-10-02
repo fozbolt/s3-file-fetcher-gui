@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-import sys
 
 def getEnvFilePath(environmentName):
     projectRoot = os.path.abspath(os.path.join(os.path.realpath(__file__), "../../../"))
@@ -29,7 +28,7 @@ def loadEnvironmentKeys(environmentName):
     if environmentName == "dev":
         awsLocalstackPort = os.getenv("AWS_LOCALSTACK_PORT")
 
-    if not awsAccessKeyId or not awsSecretKey:
+    elif not awsAccessKeyId or not awsSecretKey:
         raise ValueError(f"Missing required AWS environment variables in {envFile}")
 
     return {
