@@ -33,14 +33,14 @@ def createUniqueFileName(storeBucketPath, storeId):
     return os.path.join(storeBucketPath, f"{storeId}_{timestamp}")
 
 def generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date):
-    vehicleUrlWithBody = f"{vehicleUrl}_{vehicleUrlBody}" 
-
+    vehicleUrlWithBody = f"{vehicleUrl}_{vehicleUrlBody}" if vehicleUrlBody else f"{vehicleUrl}_undefined" #TODO should be handled by fetchVehicleRawResponse default
+   
     md5_hash = hashlib.md5()
     md5_hash.update(vehicleUrlWithBody.encode())
     vehicleUrlHashed = md5_hash.hexdigest()
 
     convertedDate = date # TODO: add different input format if needed
-
+  
     return {
         "vehicleUrlHashed": vehicleUrlHashed,
         "dailyBucketKeyPrefix": f"{convertedDate}/{vehicleUrlHashed}"

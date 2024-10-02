@@ -50,7 +50,7 @@ class App(customtkinter.CTk):
         self.scrollableFrame.grid_columnconfigure(0, weight=1)
         self.sidebarFrame.grid_rowconfigure(1, weight=3)
 
-       # Initial population of sidebar buttons
+       # initial population of sidebar buttons
         self.updateSidebarButtons()
 
     def createSidebarOptions(self):

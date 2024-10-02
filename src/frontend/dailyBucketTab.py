@@ -224,5 +224,3 @@ class DailyBucketTab:
         result = dailyBucket.fetchVehicleRawResponse(environmentName, date, url, vehicleUrlBody) #TODO test what happens if no date is entered, possibly create restriction
         self.updateTextboxDaily(result["message"], result["status"])
 
-        print(result)
-
