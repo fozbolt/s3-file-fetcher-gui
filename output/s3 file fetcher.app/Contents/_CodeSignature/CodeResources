@@ -4,6 +4,10 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Resources/.env.dev</key>
+		<data>
+		McfbcTl752gc+x5GOvNduBg9Jfw=
+		</data>
 		<key>Resources/.env.prod</key>
 		<data>
 		F0VnsNok33dfgDuwxpGYA/UN4wA=
@@ -8675,6 +8679,11 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Frameworks/.env.dev</key>
+		<dict>
+			<key>symlink</key>
+			<string>../Resources/.env.dev</string>
+		</dict>
 		<key>Frameworks/.env.prod</key>
 		<dict>
 			<key>symlink</key>
@@ -9493,6 +9502,13 @@
 		<dict>
 			<key>symlink</key>
 			<string>../Resources/wheel-0.43.0.dist-info</string>
+		</dict>
+		<key>Resources/.env.dev</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			t8czVodm0DZ6KAG3FPhf+19vt9+nVkLBxx8OD7LG2Po=
+			</data>
 		</dict>
 		<key>Resources/.env.prod</key>
 		<dict>
