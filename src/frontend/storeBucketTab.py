@@ -99,7 +99,7 @@ class StoreBucketTab:
         self.storeIdPlaceholder.configure(state="readonly")
 
     def updateEntries(self, event=None):
-        inputText = self.entryInput.get()
+        inputText = self.entryInput.get().strip()
         self.updateEntry(self.storeIdPlaceholder, inputText)
         self.updateEntry(self.convertedStoreIdPlaceholder, getFilePath(inputText))
         self.updateEntry(self.reverseCheckCmdEntry, createReverseCheckBucketCmd(self.storeRadioVar.get(), self.convertedStoreIdPlaceholder.get(), 'storeBucket'))
@@ -176,7 +176,7 @@ class StoreBucketTab:
             self.createSidebarButtons(scrollableFrame, folderName)
 
     def submit(self):
-        storeId = self.storeIdPlaceholder.get()
+        storeId = self.storeIdPlaceholder.get().strip()
         environmentName = self.storeRadioVar.get()
         result = storeBucket.fetchVehicleData(environmentName, storeId)
         self.updateTextboxStore(result["message"], result["status"])

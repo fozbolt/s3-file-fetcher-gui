@@ -16,7 +16,7 @@ class S3ConnectionManager:
                 # check if awsLocalstackPort exists and has a non-empty, valid value
                 localStackPort = environmentVars.get("awsLocalstackPort")
                 endpointUrl = None
-                if endpointUrl and str(localStackPort).strip():
+                if localStackPort and str(localStackPort).strip():
                     endpointUrl = f"http://localhost:{localStackPort}"
                 
                 cls._s3Client = boto3.client(

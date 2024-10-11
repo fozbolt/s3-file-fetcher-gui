@@ -33,8 +33,8 @@ def createUniqueFileName(storeBucketPath, storeId):
     return os.path.join(storeBucketPath, f"{storeId}_{timestamp}")
 
 def generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date):
-    vehicleUrlWithBody = f"{vehicleUrl}_{vehicleUrlBody}" if vehicleUrlBody else f"{vehicleUrl}_undefined" #TODO should be handled by fetchVehicleRawResponse default
-   
+    vehicleUrlWithBody = f"{vehicleUrl}_{json.dumps(vehicleUrlBody)}" if vehicleUrlBody else f"{vehicleUrl}_undefined" #TODO should be handled by fetchVehicleRawResponse default
+    
     md5_hash = hashlib.md5()
     md5_hash.update(vehicleUrlWithBody.encode())
     vehicleUrlHashed = md5_hash.hexdigest()
@@ -141,7 +141,7 @@ def deleteBucketHistory(self, folderName):
 def createReverseCheckBucketCmd(environmentName, filePath, bucketName):
     bucketName = loadBucketName(environmentName, bucketName)
     envKeys = loadEnvironmentKeys(environmentName)
-    localStackPort = envKeys["awsLocalstackPort"];
+    localStackPort = envKeys["awsLocalstackPort"]
 
     if environmentName == "dev" and localStackPort:
         return f"aws --endpoint-url=http://localhost:{localStackPort} s3 cp s3://{bucketName}/{filePath} ./"

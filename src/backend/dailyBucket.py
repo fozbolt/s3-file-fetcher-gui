@@ -9,7 +9,7 @@ def fetchVehicleRawResponse(environmentName, date, vehicleUrl, vehicleUrlBody):
     try:
         s3Client = s3GetClient(environmentName)
         dailyBucketParams = generateDailyBucketParams(vehicleUrl, vehicleUrlBody, date)
-
+        
         response = s3Client.get_object(Bucket=os.environ["AWS_DAILY_CACHE_BUCKET_NAME"], Key=dailyBucketParams["dailyBucketKeyPrefix"])
         result = json.load(response["Body"])
 

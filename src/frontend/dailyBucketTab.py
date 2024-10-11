@@ -222,7 +222,7 @@ class DailyBucketTab:
         return datetime.datetime.now().strftime("%Y%m%d")
 
     def submit(self):
-        urlWithBody = self.entryInput.get()
+        urlWithBody = self.entryInput.get().strip()
         url, vehicleUrlBody = (urlWithBody.rsplit("_", 1) if "_" in urlWithBody else (urlWithBody, None))
         environmentName = self.dailyRadioVar.get()
         date = self.dateInput.get()
