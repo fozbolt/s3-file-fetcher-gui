@@ -11,8 +11,10 @@ def getEnvFilePath(environmentName):
     
     return envFile
 
+
 def loadEnvFile(envFile):
     load_dotenv(envFile, override=True)
+
 
 def loadEnvironmentKeys(environmentName):
     for var in ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY", "AWS_LOCALSTACK_PORT"]:
@@ -25,8 +27,10 @@ def loadEnvironmentKeys(environmentName):
     awsSecretKey = os.getenv("AWS_SECRET_ACCESS_KEY")
     
     awsLocalstackPort = None
-    if environmentName == "dev":
-        awsLocalstackPort = os.getenv("AWS_LOCALSTACK_PORT")
+    awsLocalstackPortRaw = os.getenv("AWS_LOCALSTACK_PORT")
+    
+    if environmentName == "dev" and str(awsLocalstackPortRaw).strip():
+        awsLocalstackPort = awsLocalstackPortRaw
 
     elif not awsAccessKeyId or not awsSecretKey:
         raise ValueError(f"Missing required AWS environment variables in {envFile}")
@@ -36,6 +40,7 @@ def loadEnvironmentKeys(environmentName):
         "awsSecretKey": awsSecretKey,
         "awsLocalstackPort": awsLocalstackPort,
     }
+
 
 def loadBucketName(environmentName, bucketAlias):
     envFile = getEnvFilePath(environmentName)

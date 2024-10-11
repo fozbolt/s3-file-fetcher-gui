@@ -12,12 +12,18 @@ class S3ConnectionManager:
         if cls._cachedEnv != environmentName:
             try:
                 environmentVars = loadEnvironmentKeys(environmentName)
+
+                # check if awsLocalstackPort exists and has a non-empty, valid value
+                localStackPort = environmentVars.get("awsLocalstackPort")
+                endpointUrl = None
+                if endpointUrl and str(localStackPort).strip():
+                    endpointUrl = f"http://localhost:{localStackPort}"
                 
                 cls._s3Client = boto3.client(
                     's3',
                     aws_access_key_id=environmentVars["awsAccessKeyId"],
                     aws_secret_access_key=environmentVars["awsSecretKey"],
-                    endpoint_url=f"http://localhost:{environmentVars['awsLocalstackPort']}" if environmentVars.get("awsLocalstackPort") else None
+                    endpoint_url=endpointUrl
                 )
                 
                 cls._cachedEnv = environmentName

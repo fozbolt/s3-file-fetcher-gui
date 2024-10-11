@@ -3,6 +3,7 @@ from src.backend.backendHelperFunctions import getSortedBucketFileNames, deleteB
 from src.backend import dailyBucket
 import os
 import subprocess
+import datetime
 
 class DailyBucketTab:
     def __init__(self, tab, app):
@@ -81,6 +82,7 @@ class DailyBucketTab:
 
         self.dateInput = customtkinter.CTkEntry(self.tab, placeholder_text="YYYYMMDD", width=150)
         self.dateInput.grid(row=12, column=1, padx=(5, 10), pady=(20, 5), sticky="ew")
+        self.dateInput.insert(0, self.getCurrentDate())
         self.dateInput.bind("<KeyRelease>", self.updateEntries)
 
         self.mainButton = customtkinter.CTkButton(self.tab, text="Submit", fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), command=self.submit)
@@ -128,7 +130,7 @@ class DailyBucketTab:
         self.updateEntry(self.reverseDailyCheckCmdEntry, createReverseCheckBucketCmd(self.dailyRadioVar.get(), self.dateAndHashedUrlEntry.get(), 'dailyBucket'))
 
     def updateEntries(self, event=None):
-        urlWithBody = self.entryInput.get()
+        urlWithBody = self.entryInput.get().strip()
         url, vehicleUrlBody = (urlWithBody.rsplit("_", 1) if "_" in urlWithBody else (urlWithBody, "undefined")) #TODO this is bad practice, improve
         dateInput = self.dateInput.get()
         self.updateEntry(self.dailyEntryDisplay, url)
@@ -214,6 +216,10 @@ class DailyBucketTab:
 
         if (result["status"] == "success"):
             self.createSidebarButtons(scrollableFrame, folderName)
+
+    # Returns today's date in "YYYYMMDD" format
+    def getCurrentDate(self):
+        return datetime.datetime.now().strftime("%Y%m%d")
 
     def submit(self):
         urlWithBody = self.entryInput.get()
